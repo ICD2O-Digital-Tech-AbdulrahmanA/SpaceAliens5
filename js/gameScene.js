@@ -33,8 +33,12 @@ class GameScene extends Phaser.Scene {
         this.gameOverText = null
         this.gameOverTextStyle = { font: '65px Arial', fill: '#ff0000', align: 'center' }
 
+        this.missileScale = 1
+
         this.powerUpSpawned = false
+        this.powerUp2Spawned = false
         this.hasShield = false
+        this.hasMissileBuff = false
     }
   
   
@@ -50,6 +54,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('missile', 'assets/missile.png')
         this.load.image('alien', 'assets/alien.png')
         this.load.image('powerUp', 'assets/powerUp.png')
+        this.load.image('powerUp2', 'assets/powerUp2.png')
         this.load.image('shield', 'assets/shield.png')
 
         // sound
@@ -69,6 +74,7 @@ class GameScene extends Phaser.Scene {
         this.missileGroup = this.physics.add.group()
         this.alienGroup = this.add.group()
         this.powerUpGroup = this.physics.add.group()
+        this.powerUp2Group = this.physics.add.group()
         this.createAlien()
         this.shield = this.add.image(this.ship.x, this.ship.y, 'shield').setScale(0.12)
         this.shield.setVisible(false)
@@ -78,7 +84,7 @@ class GameScene extends Phaser.Scene {
             this.score = this.score + 1
             this.scoreText.setText('Score: ' + this.score.toString())
             this.sound.play('explosion')
-            if (this.score === 15 || this.score === 30 || this.score === 45 || this.score === 60 && !this.powerUpSpawned) {
+            if (this.score === 15 || this.score === 30 || this.score === 45 || this.score === 60 || this.score === 75 || this.score === 90 || this.score === 105 && !this.powerUpSpawned) {
                 const powerUp = this.physics.add.sprite(
                     Phaser.Math.Between(100, 1820),
                     Phaser.Math.Between(100, 900),
@@ -87,11 +93,19 @@ class GameScene extends Phaser.Scene {
                 this.powerUpGroup.add(powerUp)
                 this.powerUpSpawned = true
             }
+            if (this.score === 50 && !this.powerUp2Spawned) {
+                const powerUp2 = this.physics.add.sprite(
+                    Phaser.Math.Between(100, 1820),
+                    Phaser.Math.Between(100, 900),
+                    'powerUp2'
+                )
+            }
+                this.powerUp2Group.add(powerUp2)
+                this.powerUp2Spawned = true
             this.createAlien()
             this.createAlien()
         }.bind(this))
 
-        
     
         this.physics.add.collider(this.ship, this.alienGroup, function (shipCollide, alienCollide) {
             if (this.hasShield) {
@@ -110,7 +124,9 @@ class GameScene extends Phaser.Scene {
             this.gameOverText.on('pointerdown', () => this.scene.start('gameScene'))
         }.bind(this))
 
-            this.physics.add.overlap(this.ship, this.powerUpGroup, this.collectPowerUp, null, this)
+        this.physics.add.overlap(this.ship, this.powerUpGroup, this.collectPowerUp, null, this)
+        
+
         }
 
         collectPowerUp(ship, powerUp) {
