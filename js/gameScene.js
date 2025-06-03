@@ -10,6 +10,11 @@ class GameScene extends Phaser.Scene {
     
     // create an alien
     createAlien() {
+        // Only create if below max
+        if (this.currentAlienCount >= 25) {
+            return
+        }
+        
         const alienXLocation = Math.floor(Math.random() * 1920) + 2
         let alienXVelocity = Math.floor(Math.random() * 50) + 2
         alienXVelocity *= Math.round(Math.random()) ? 1 : -1
@@ -17,6 +22,7 @@ class GameScene extends Phaser.Scene {
         anAlien.body.velocity.y = 200
         anAlien.body.velocity.x = alienXVelocity
         this.alienGroup.add(anAlien)
+        this.currentAlienCount++ // Increment counter
     }
 
     constructor() {
@@ -37,6 +43,7 @@ class GameScene extends Phaser.Scene {
         this.powerUp2Spawned = false
         this.hasShield = false
         this.hasMissileBuff = false
+        this.currentAlienCount = 0  // Add this line
     }
   
   
@@ -51,6 +58,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('ship', 'assets/spaceShip.png')
         this.load.image('missile', 'assets/missile.png')
         this.load.image('alien', 'assets/alien.png')
+        this.load.image('explosion', 'assets/explosion.png') // Add this line
         this.load.image('powerUp', 'assets/powerUp.png')
         this.load.image('powerUp2', 'assets/powerUp2.png')
         this.load.image('shield', 'assets/shield.png')
@@ -77,7 +85,16 @@ class GameScene extends Phaser.Scene {
         this.shield = this.add.image(this.ship.x, this.ship.y, 'shield').setScale(0.12)
         this.shield.setVisible(false)
         this.physics.add.overlap(this.missileGroup, this.alienGroup, function (missileCollide, alienCollide) {
+            // Create explosion at alien's position
+            const explosion = this.add.sprite(alienCollide.x, alienCollide.y, 'explosion')
+            
+            // Remove explosion after 200ms
+            this.time.delayedCall(200, function() {
+                explosion.destroy()
+            }, [], this)
+            
             alienCollide.destroy()
+            this.currentAlienCount--
             missileCollide.destroy()
             this.score = this.score + 1
             this.scoreText.setText('Score: ' + this.score.toString())
@@ -107,7 +124,16 @@ class GameScene extends Phaser.Scene {
     
         this.physics.add.collider(this.ship, this.alienGroup, function (shipCollide, alienCollide) {
             if (this.hasShield) {
+                // Create explosion at alien's position
+                const explosion = this.add.sprite(alienCollide.x, alienCollide.y, 'explosion')
+                
+                // Remove explosion after 200ms
+                this.time.delayedCall(200, function() {
+                    explosion.destroy()
+                }, [], this)
+                
                 alienCollide.destroy()
+                this.currentAlienCount--
                 this.shield.setVisible(false)
                 this.hasShield = false
                 return
@@ -138,17 +164,8 @@ class GameScene extends Phaser.Scene {
 
         collectPowerUp2(ship, powerUp2) {
             powerUp2.destroy()
-            console.log('Power-up 2 collected! Missile buff activated.')
-
+            console.log('Power-up 2 collected! Permanent missile buff activated!')
             this.hasMissileBuff = true
-            this.time.addEvent({
-                delay: 5000,
-                callback: () => {
-                    this.hasMissileBuff = false
-                    console.log('Missile buff deactivated.')
-                },
-                callbackScope: this
-            })
         }
     
 
@@ -200,7 +217,7 @@ class GameScene extends Phaser.Scene {
                 this.fireMissile = true
                 const aNewMissile = this.physics.add.sprite(this.ship.x, this.ship.y, 'missile')
                 if (this.hasMissileBuff) {
-                    aNewMissile.setScale(2.0) // Makes missiles twice as big
+                    aNewMissile.setScale(4.0) // Makes missiles 4x bigger instead of 2x
                 }
                 this.missileGroup.add(aNewMissile)
                 this.sound.play('laser')
