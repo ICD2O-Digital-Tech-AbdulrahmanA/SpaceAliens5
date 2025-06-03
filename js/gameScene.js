@@ -96,7 +96,7 @@ class GameScene extends Phaser.Scene {
                     Phaser.Math.Between(100, 1820),
                     Phaser.Math.Between(100, 900),
                     'powerUp2'
-                )
+                ).setScale(0.5) // Makes the powerUp2 half size
                 this.powerUp2Group.add(powerUp2)
                 this.powerUp2Spawned = true
             }
@@ -123,6 +123,7 @@ class GameScene extends Phaser.Scene {
         }.bind(this))
 
         this.physics.add.overlap(this.ship, this.powerUpGroup, this.collectPowerUp, null, this)
+        this.physics.add.overlap(this.ship, this.powerUp2Group, this.collectPowerUp2, null, this)
         
 
         }
@@ -135,7 +136,20 @@ class GameScene extends Phaser.Scene {
             this.hasShield = true
         }
 
+        collectPowerUp2(ship, powerUp2) {
+            powerUp2.destroy()
+            console.log('Power-up 2 collected! Missile buff activated.')
 
+            this.hasMissileBuff = true
+            this.time.addEvent({
+                delay: 5000,
+                callback: () => {
+                    this.hasMissileBuff = false
+                    console.log('Missile buff deactivated.')
+                },
+                callbackScope: this
+            })
+        }
     
 
     update(time, delta) {
@@ -185,6 +199,9 @@ class GameScene extends Phaser.Scene {
             if (this.fireMissile === false) {
                 this.fireMissile = true
                 const aNewMissile = this.physics.add.sprite(this.ship.x, this.ship.y, 'missile')
+                if (this.hasMissileBuff) {
+                    aNewMissile.setScale(2.0) // Makes missiles twice as big
+                }
                 this.missileGroup.add(aNewMissile)
                 this.sound.play('laser')
             }
