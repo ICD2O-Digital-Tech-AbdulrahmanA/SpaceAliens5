@@ -194,8 +194,7 @@ class GameScene extends Phaser.Scene {
 
         this.alienGroup.children.each(function (alien) {
             if (alien.y > 1080) {
-                alien.destroy()
-                this.createAlien
+                alien.y = 0
             }
         }, this)
 
