@@ -192,12 +192,13 @@ class GameScene extends Phaser.Scene {
             this.shield.y = this.ship.y
         }
 
-        this.alienGroup.getChildren().forEach(function (alien) {
+        this.alienGroup.children.each(function (alien) {
             if (alien.y > 1080) {
                 alien.destroy()
-                this.createAlien()
+                this.createAlien
             }
         })
+
     }
 }
 
