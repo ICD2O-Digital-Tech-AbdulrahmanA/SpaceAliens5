@@ -197,7 +197,7 @@ class GameScene extends Phaser.Scene {
                 alien.destroy()
                 this.createAlien
             }
-        })
+        }, this)
 
     }
 }
