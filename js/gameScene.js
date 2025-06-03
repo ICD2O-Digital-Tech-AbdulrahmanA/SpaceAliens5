@@ -33,8 +33,6 @@ class GameScene extends Phaser.Scene {
         this.gameOverText = null
         this.gameOverTextStyle = { font: '65px Arial', fill: '#ff0000', align: 'center' }
 
-        this.missileScale = 1
-
         this.powerUpSpawned = false
         this.powerUp2Spawned = false
         this.hasShield = false
@@ -99,9 +97,9 @@ class GameScene extends Phaser.Scene {
                     Phaser.Math.Between(100, 900),
                     'powerUp2'
                 )
-            }
                 this.powerUp2Group.add(powerUp2)
                 this.powerUp2Spawned = true
+            }
             this.createAlien()
             this.createAlien()
         }.bind(this))
