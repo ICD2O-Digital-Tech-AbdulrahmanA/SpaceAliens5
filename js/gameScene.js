@@ -132,8 +132,7 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.ship, this.alienGroup, function (shipCollide, alienCollide) {
             if (this.hasShield) {
                 // shield blocks the hit
-                const explosion = this.add.sprite(alienCollide.x, alienCollide.y, 'explosion')
-                                    .setScale(0.2)
+                const explosion = this.add.sprite(alienCollide.x, alienCollide.y, 'explosion').setScale(0.2)
                 
                 this.time.delayedCall(200, function() {
                     explosion.destroy()
